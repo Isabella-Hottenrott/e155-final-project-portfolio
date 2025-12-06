@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>fpga – E155 Final Portfolio</title>
+<title>Team – E155 Final Portfolio</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -94,7 +94,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link active" href="./about.html" aria-current="page"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
@@ -106,7 +106,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">MCU</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./fpga.html" aria-current="page"> 
+    <a class="nav-link" href="./fpga.html"> 
 <span class="menu-text">FPGA</span></a>
   </li>  
   <li class="nav-item">
@@ -133,106 +133,115 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#fpga-components" id="toc-fpga-components" class="nav-link active" data-scroll-target="#fpga-components">FPGA Components</a>
-  <ul class="collapse">
-  <li><a href="#reading-spi-data-interpretation" id="toc-reading-spi-data-interpretation" class="nav-link" data-scroll-target="#reading-spi-data-interpretation">Reading SPI &amp; Data Interpretation</a>
-  <ul class="collapse">
-  <li><a href="#spi-reception" id="toc-spi-reception" class="nav-link" data-scroll-target="#spi-reception">SPI Reception</a></li>
-  <li><a href="#data-interpretation" id="toc-data-interpretation" class="nav-link" data-scroll-target="#data-interpretation">Data Interpretation</a></li>
-  </ul></li>
-  <li><a href="#game-logic" id="toc-game-logic" class="nav-link" data-scroll-target="#game-logic">Game Logic</a></li>
-  <li><a href="#lcd" id="toc-lcd" class="nav-link" data-scroll-target="#lcd">LCD</a>
-  <ul class="collapse">
-  <li><a href="#hardware" id="toc-hardware" class="nav-link" data-scroll-target="#hardware">Hardware</a></li>
-  <li><a href="#memory" id="toc-memory" class="nav-link" data-scroll-target="#memory">Memory</a></li>
-  </ul></li>
-  </ul></li>
+  <li><a href="#meet-the-team" id="toc-meet-the-team" class="nav-link active" data-scroll-target="#meet-the-team">Meet the Team</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
 
-
-
-
-<section id="fpga-components" class="level1">
-<h1>FPGA Components</h1>
-<p>In this project, the iCE40UP5K FPGA board from Lattice was used. The two major processes involved on the FPGA involved interpretation of data from the MCU, executing game logic, and driving the LCD screen.</p>
-<section id="reading-spi-data-interpretation" class="level2">
-<h2 class="anchored" data-anchor-id="reading-spi-data-interpretation">Reading SPI &amp; Data Interpretation</h2>
-<section id="spi-reception" class="level3">
-<h3 class="anchored" data-anchor-id="spi-reception">SPI Reception</h3>
-<p>To interface the MCU with the FPGA, a SPI-receiver module was built that reconstructs each 8-bit transaction from the serial data in. On the ninth clock cycle of the transaction, the module outputs a packaged 8-bit signal in parrallel. A syncrhonizer then transfers this data into the clock domain of the FPGA.</p>
-</section>
-<section id="data-interpretation" class="level3">
-<h3 class="anchored" data-anchor-id="data-interpretation">Data Interpretation</h3>
-<p>Incoming data fell into two groups:</p>
-<ul>
-<li>Display commands to update the LCD screen</li>
-<li>Game-state processing</li>
-</ul>
-<p>This classification was encoded into the byte sent from the MCU, allowing a multiplexer module to distinguish between the two and direct internal data flow to its corresponding modules. Signals commanding an update on the display was sent to a decoder that pulled the correct message from memory. Signals for game processing were sent to modules that interpreted the game state and precalculated the next computer move using game logic.</p>
-</section>
-</section>
-<section id="game-logic" class="level2">
-<h2 class="anchored" data-anchor-id="game-logic">Game Logic</h2>
-<p>The game logic for this project was integrated as a collection of <em>optional</em> modules within the FPGA design. Our decision model was derived from strategies published in a <a href="https://arxiv.org/pdf/1404.5199v1">study</a> on competition phenomena. The computer’s next move depends on two factors: the outcome ofthe previous round {win, lose, tie}, and the user’s previous gesture {rock, paper, scissors}. These values were encoded as internal state, providing context for the FPGA across rounds.</p>
-<p>When a new user gesture arrives from the LiDAR sensors, the logic immediately determines the outcome of the current round by comparing it with a precomputed computer move. At the same time, it precalculates the next computer move using the game theory. This calculation assumes perfect hidden information, so the next-move computation does not depend on any current-round data.</p>
-<p>The full game-logic pipeline was validated using a testbench below and passed all evaluated cases.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/gametheory_proof.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 1: Testbench for Game Theory Logic Implementation</figcaption>
-</figure>
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Team</h1>
 </div>
-</section>
-<section id="lcd" class="level2">
-<h2 class="anchored" data-anchor-id="lcd">LCD</h2>
-<p>A 20x2 LCD was implemented, allowing the ability to display messages up to 40 characters in length. The system needed to display 11 various messages, the data of which was retrieved using the messages.sv submodule.</p>
-<p>To interface with the display, the lcd_driver module was responsible for controlling the LCD’s eleven input pins. This dirver used an FSM to step through all the various initialization steps, write the desired message to the LCD screen, and retrieve the necessary data from the internal EBR on the FPGA.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/lcd_driver_fsm.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 2: LCD Driver FSM</figcaption>
-</figure>
-</div>
-<p>To keep track of screen updates, the system <em>TRACKED</em> the current and previous screen. When these differed, the driver repositioned the cursor and cleared the display before writing a new message. Otherwise, the FPGA continuously cycled through the same 20-character message, appearing static to the user.</p>
-<p>Several states in the FSM required a precise wait period to allow for proper initialization. A counter was implemented to determine these specific time periods. The maximum counter value was set before the <em>WAIT</em> states, only exiting these states when the counter reached 0.</p>
-<section id="hardware" class="level3">
-<h3 class="anchored" data-anchor-id="hardware">Hardware</h3>
-<p>The LCD interface required eleven FPAG pins: eight for a parrallel data bus (DB [7:0]) and three control signals- enable (en), read/write (rw, for internal ROM), and data select (rs). The backlight for the LCD was powered by 5V, and the character contrast was determined using a variable voltaged provided by a potentiometer.</p>
-<p>Once the initialization and command sequences were completed, the LCD displayed characters corresponding to the ASCII code communicated over the DB pins.</p>
-</section>
-<section id="memory" class="level3">
-<h3 class="anchored" data-anchor-id="memory">Memory</h3>
-<p>Eleven different messages needed to be displayed on the LCD. Each message consisted of 20 ASCII characters, each of which represented by two hex digits, totalling to 40 bytes. While these couldhave been hard-coded directly into the RTL, using the FPGA’s embedded block RAM produced a cleaner design and provided experience working with on-chip memory.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/ebr_config.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 3: EBR Configuration</figcaption>
-</figure>
-</div>
-<p>To configure the memory, the Lattic IP generator was used to specify the exact ROM size (160 x 22). Retrieval of each word from the EBR was accomplished by inputting the address of the message. To store all these messages in memory, a .mem file was produced with a python sscript and accessible to the FPGA.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/messages_waveform.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 4: Testbench for the Message Outputs</figcaption>
-</figure>
-</div>
-<p>The waveforms show validation of the memory integration.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="images/messages_proof.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 5: Printed Outputs in the Quartus Terminal for the Message Testbench</figcaption>
-</figure>
-</div>
-<p>Each line corresponds to a message address, where the first message is at address 0, the second message is at address 1, and so on. Messages contained the ASCII character values and were further padded with 0x20- the code for extra space to produce 160 bit data messages.</p>
-<p>The top-level memory module took in a message address and a character index, indicating which character should eb written in that moment.</p>
 
 
-</section>
-</section>
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="meet-the-team" class="level1">
+<h1>Meet the Team</h1>
+<style>
+.team-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 20px;
+}
+
+.team-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 300px;
+}
+
+.headshot img {
+  border-radius: 50%;
+  width: 200px;       /* Controls the size */
+  height: auto;       /* Keeps proportions correct */
+  aspect-ratio: 1/1;  /* Ensures the image displays as a circle */
+  object-fit: cover;  /* Crops the image nicely without distortion */
+  object-position: center 5%;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.bio h3 {
+  margin: 10px 0;
+}
+
+.social-links a {
+  margin: 5px;
+  text-decoration: none;
+  color: #007acc;
+  font-weight: bold;
+}
+
+.social-links a:hover {
+  text-decoration: underline;
+}
+</style>
+<div class="team-container">
+
+
+  <div class="team-member">
+    <div class="headshot">
+      <img src="images/bella.jpg" alt="Bella Hottenrott Headshot">
+    </div>
+    <div class="bio">
+      <h3 class="anchored" data-anchor-id="meet-the-team">Bella Hottenrott</h3>
+      <div class="social-links">
+        <a href="https://www.linkedin.com/in/isabella-hottenrott-ba6200259/">LinkedIn</a>
+        <a href="https://github.com/Isabella-Hottenrott/">GitHub</a>
+        <a href="https://isabella-hottenrott.github.io/hmc-e155-portfolio/">E155 Website</a>
+      </div>
+      <p>Bella is a senior engineering student, focusing in electrical and computer engineering. She enjoys the intersection between hardware and digital design and has loved her time enrolled in MicroPs.</p>
+    </div>
+  </div>
+
+
+
+  <div class="team-member">
+    <div class="headshot">
+      <img src="images/headshot_wchan.jpg" alt="Wava Chan Headshot">
+    </div>
+    <div class="bio">
+      <h3 class="anchored">Wava Chan</h3>
+      <div class="social-links">
+        <a href="https://www.linkedin.com/in/wava-chan-b2b894215/">LinkedIn</a>
+        <a href="https://github.com/wchan03">GitHub</a>
+        <a href="https://wchan03.github.io/e155Website/">E155 Website</a>
+      </div>
+      <p>Wava Chan just graduated from Harvey Mudd College with a degree in engineering. She is interested in firmware and hardware development, and embedded systems. She really enjoyed this project, even through the late nights, and was very excited when the LCD screen worked!</p>
+    </div>
+  </div>
+
+
+</div>
+
+
 </section>
 
 </main> <!-- /main -->
@@ -308,7 +317,7 @@ ul.task-list li input[type="checkbox"] {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Isabella-Hottenrott\.github\.io\/e155-final-project-portfolio\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Team – E155 Final Portfolio</title>
+<title>results – E155 Final Portfolio</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -94,7 +94,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./about.html" aria-current="page"> 
+    <a class="nav-link" href="./about.html"> 
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
@@ -110,7 +110,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">FPGA</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./results.html"> 
+    <a class="nav-link active" href="./results.html" aria-current="page"> 
 <span class="menu-text">Results</span></a>
   </li>  
   <li class="nav-item">
@@ -133,113 +133,40 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#meet-the-team" id="toc-meet-the-team" class="nav-link active" data-scroll-target="#meet-the-team">Meet the Team</a></li>
+  <li><a href="#results" id="toc-results" class="nav-link active" data-scroll-target="#results">Results</a></li>
+  <li><a href="#issues" id="toc-issues" class="nav-link" data-scroll-target="#issues">Issues</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Team</h1>
+
+
+
+<section id="results" class="level1">
+<h1>Results</h1>
+<p>A fully functional rock paper scissors system was implemented. The LiDAR system reliably detects the user’s gesture, and the LCD screen communicates proper outcomes and stages of the game.</p>
+<p>For demo day, there are a couple of key differences from the original design. These changes include:</p>
+<ul>
+<li>Game logic was moved to the MCU</li>
+<li>Communication between the FPGA and MCU was changed to parallel communication</li>
+<li>The 10-round system was removed, allowing palyers to play indefinitely</li>
+</ul>
+<p>The below block diagram represents the design previewed on demo day.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/final_block_diagram.png" class="img-fluid figure-img" style="width:75.0%"></p>
+<figcaption>Block Diagram Implemented on Demo Day</figcaption>
+</figure>
 </div>
-
-
-
-<div class="quarto-title-meta">
-
-    
-  
-    
-  </div>
-  
-
-
-</header>
-
-
-<section id="meet-the-team" class="level1">
-<h1>Meet the Team</h1>
-<style>
-.team-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-around;
-  gap: 20px;
-}
-
-.team-member {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  max-width: 300px;
-}
-
-.headshot img {
-  border-radius: 50%;
-  width: 200px;       /* Controls the size */
-  height: auto;       /* Keeps proportions correct */
-  aspect-ratio: 1/1;  /* Ensures the image displays as a circle */
-  object-fit: cover;  /* Crops the image nicely without distortion */
-  object-position: center 5%;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.bio h3 {
-  margin: 10px 0;
-}
-
-.social-links a {
-  margin: 5px;
-  text-decoration: none;
-  color: #007acc;
-  font-weight: bold;
-}
-
-.social-links a:hover {
-  text-decoration: underline;
-}
-</style>
-<div class="team-container">
-
-
-  <div class="team-member">
-    <div class="headshot">
-      <img src="images/bella.jpg" alt="Bella Hottenrott Headshot">
-    </div>
-    <div class="bio">
-      <h3 class="anchored" data-anchor-id="meet-the-team">Bella Hottenrott</h3>
-      <div class="social-links">
-        <a href="https://www.linkedin.com/in/isabella-hottenrott-ba6200259/">LinkedIn</a>
-        <a href="https://github.com/Isabella-Hottenrott/">GitHub</a>
-        <a href="https://isabella-hottenrott.github.io/hmc-e155-portfolio/">E155 Website</a>
-      </div>
-      <p>Bella is a senior engineering student, focusing in electrical and computer engineering. She enjoys the intersection between hardware and digital design and has loved her time enrolled in MicroPs.</p>
-    </div>
-  </div>
-
-
-
-  <div class="team-member">
-    <div class="headshot">
-      <img src="images/headshot_wchan.jpg" alt="Wava Chan Headshot">
-    </div>
-    <div class="bio">
-      <h3 class="anchored">Wava Chan</h3>
-      <div class="social-links">
-        <a href="https://www.linkedin.com/in/wava-chan-b2b894215/">LinkedIn</a>
-        <a href="https://github.com/wchan03">GitHub</a>
-        <a href="https://wchan03.github.io/e155Website/">E155 Website</a>
-      </div>
-      <p>Wava Chan just graduated from Harvey Mudd College with a degree in engineering. She is interested in firmware and hardware development, and embedded systems. She really enjoyed this project, even through the late nights, and was very excited when the LCD screen worked!</p>
-    </div>
-  </div>
-
-
-</div>
+</section>
+<section id="issues" class="level1">
+<h1>Issues</h1>
+<p>Though we have faith in our original design, some changes were introduced to refine a working solution for demo day.</p>
+<p>The FPGA game logic worked in simulation, but faced integration issues. These changes were needed to overcome challenges in synchronization between clocks and processes for game state calculations done between the FPGA and MCU. Game logic was moved to the MCU to eliminate the associated problems. This also meant the communication between the FPGA and MCU was changed. Though SPI was fully functional at the mid-point checkoff, parallel communication reduced the areas to debug. Transactions were small, anyways, so the new parallel communication required only three bits.</p>
+<p>The 10 round system was good in theory, but in reality would have taken too long when cycling between different audience members during demo day.</p>
+<p>The LiDAR sensors kept throwing an errors whenever more than four sensors were implemented at a time. To try to diagnose this issue, we tried to speak with them over an arduino, providing easy access to their entire API. The arduino was mostly able to communicate with the sensors, leading us to believe the issues might lie in voltage regulation or power consumption past four sensors, and that this was better handled by the arduino instead of the MCU.</p>
 
 
 </section>
@@ -317,7 +244,7 @@ ul.task-list li input[type="checkbox"] {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Isabella-Hottenrott\.github\.io\/e155-final-project-portfolio\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

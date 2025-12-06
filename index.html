@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>results – E155 Final Portfolio</title>
+<title>E155 Final Project Portfolio – E155 Final Portfolio</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -90,7 +90,7 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html"> 
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
@@ -110,7 +110,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">FPGA</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./results.html" aria-current="page"> 
+    <a class="nav-link" href="./results.html"> 
 <span class="menu-text">Results</span></a>
   </li>  
   <li class="nav-item">
@@ -128,48 +128,40 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <nav id="TOC" role="doc-toc" class="toc-active">
-    <h2 id="toc-title">On this page</h2>
-   
-  <ul>
-  <li><a href="#results" id="toc-results" class="nav-link active" data-scroll-target="#results">Results</a></li>
-  <li><a href="#issues" id="toc-issues" class="nav-link" data-scroll-target="#issues">Issues</a></li>
-  </ul>
-</nav>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"></header>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">E155 Final Project Portfolio</h1>
+</div>
 
 
 
+<div class="quarto-title-meta">
 
-<section id="results" class="level1">
-<h1>Results</h1>
-<p>A fully functional rock paper scissors system was implemented. The LiDAR system reliably detects the user’s gesture, and the LCD screen communicates proper outcomes and stages of the game.</p>
-<p>For demo day, there are a couple of key differences from the original design. These changes include:</p>
-<ul>
-<li>Game logic was moved to the MCU</li>
-<li>Communication between the FPGA and MCU was changed to parallel communication</li>
-<li>The 10-round system was removed, allowing palyers to play indefinitely</li>
-</ul>
-<p>The below block diagram represents the design previewed on demo day.</p>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This portfolio presents an implementation of Rock, Paper, Scissors using LiDAR sensors for hand-gesture recognition and game theory to beat opponents. The source code can be found in our <a href="https://github.com/Isabella-Hottenrott/e155-final-project">e155-final-project repository</a>.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/final_block_diagram.png" class="img-fluid figure-img" style="width:75.0%"></p>
-<figcaption>Block Diagram Implemented on Demo Day</figcaption>
+<p><img src="images/teampic.jpg" class="img-fluid figure-img"></p>
+<figcaption>Bella and Wava on Demo Day!</figcaption>
 </figure>
 </div>
-</section>
-<section id="issues" class="level1">
-<h1>Issues</h1>
-<p>Though we have faith in our original design, some changes were introduced to refine a working solution for demo day.</p>
-<p>The FPGA game logic worked in simulation, but faced integration issues. These changes were needed to overcome challenges in synchronization between clocks and processes for game state calculations done between the FPGA and MCU. Game logic was moved to the MCU to eliminate the associated problems. This also meant the communication between the FPGA and MCU was changed. Though SPI was fully functional at the mid-point checkoff, parallel communication reduced the areas to debug. Transactions were small, anyways, so the new parallel communication required only three bits.</p>
-<p>The 10 round system was good in theory, but in reality would have taken too long when cycling between different audience members during demo day.</p>
-<p>The LiDAR sensors kept throwing an errors whenever more than four sensors were implemented at a time. To try to diagnose this issue, we tried to speak with them over an arduino, providing easy access to their entire API. The arduino was mostly able to communicate with the sensors, leading us to believe the issues might lie in voltage regulation or power consumption past four sensors, and that this was better handled by the arduino instead of the MCU.</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
@@ -244,7 +236,7 @@ ul.task-list li input[type="checkbox"] {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Isabella-Hottenrott\.github\.io\/e155-final-project-portfolio\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

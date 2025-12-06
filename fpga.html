@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>introduction – E155 Final Portfolio</title>
+<title>fpga – E155 Final Portfolio</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -98,7 +98,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./introduction.html" aria-current="page"> 
+    <a class="nav-link" href="./introduction.html"> 
 <span class="menu-text">Introduction</span></a>
   </li>  
   <li class="nav-item">
@@ -106,7 +106,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">MCU</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./fpga.html"> 
+    <a class="nav-link active" href="./fpga.html" aria-current="page"> 
 <span class="menu-text">FPGA</span></a>
   </li>  
   <li class="nav-item">
@@ -133,11 +133,19 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
-  <li><a href="#overall-design" id="toc-overall-design" class="nav-link" data-scroll-target="#overall-design">Overall Design</a>
+  <li><a href="#fpga-components" id="toc-fpga-components" class="nav-link active" data-scroll-target="#fpga-components">FPGA Components</a>
   <ul class="collapse">
-  <li><a href="#software" id="toc-software" class="nav-link" data-scroll-target="#software">Software</a></li>
+  <li><a href="#reading-spi-data-interpretation" id="toc-reading-spi-data-interpretation" class="nav-link" data-scroll-target="#reading-spi-data-interpretation">Reading SPI &amp; Data Interpretation</a>
+  <ul class="collapse">
+  <li><a href="#spi-reception" id="toc-spi-reception" class="nav-link" data-scroll-target="#spi-reception">SPI Reception</a></li>
+  <li><a href="#data-interpretation" id="toc-data-interpretation" class="nav-link" data-scroll-target="#data-interpretation">Data Interpretation</a></li>
+  </ul></li>
+  <li><a href="#game-logic" id="toc-game-logic" class="nav-link" data-scroll-target="#game-logic">Game Logic</a></li>
+  <li><a href="#lcd" id="toc-lcd" class="nav-link" data-scroll-target="#lcd">LCD</a>
+  <ul class="collapse">
   <li><a href="#hardware" id="toc-hardware" class="nav-link" data-scroll-target="#hardware">Hardware</a></li>
+  <li><a href="#memory" id="toc-memory" class="nav-link" data-scroll-target="#memory">Memory</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -148,37 +156,82 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="abstract" class="level1">
-<h1>Abstract</h1>
-<p>This project implements a rock-paper-scissors game in hardware, enabling a user to play directly against the computer. The system captrues user’s hand gestures using LiDAR sensors that classify the hand shapes. An LCD screen communicates prompts, system feedback, and game results with the user.</p>
-<p>When the game begins, the user is asked to press a button to indicate the start of a new round. The user is then prompted to present a gesture. The LiDAR system interprets this and forwards the result to the FPGA, which displays outcomes and game state on the LCD. The display then resets to the initial prompt, preparing for the next round. A user can proceed to a new round, playing against a game logic implementation and likely increasing the difficulty of winning.</p>
+<section id="fpga-components" class="level1">
+<h1>FPGA Components</h1>
+<p>In this project, the iCE40UP5K FPGA board from Lattice was used. The two major processes involved on the FPGA involved interpretation of data from the MCU, executing game logic, and driving the LCD screen.</p>
+<section id="reading-spi-data-interpretation" class="level2">
+<h2 class="anchored" data-anchor-id="reading-spi-data-interpretation">Reading SPI &amp; Data Interpretation</h2>
+<section id="spi-reception" class="level3">
+<h3 class="anchored" data-anchor-id="spi-reception">SPI Reception</h3>
+<p>To interface the MCU with the FPGA, a SPI-receiver module was built that reconstructs each 8-bit transaction from the serial data in. On the ninth clock cycle of the transaction, the module outputs a packaged 8-bit signal in parrallel. A syncrhonizer then transfers this data into the clock domain of the FPGA.</p>
 </section>
-<section id="overall-design" class="level1">
-<h1>Overall Design</h1>
-<section id="software" class="level3">
-<h3 class="anchored" data-anchor-id="software">Software</h3>
-<p>The system is built around two main controllers- the STM32L432KC micrcontroller and the iCE40UP5k FGPA ont he UPduino development board.</p>
-<p>The MCU interfaced with an array of VL53L0X time-of-flight sensors to capture the user’s hand gesture. The gestures were classified, and the result was transmitted to the FPGA via SPI. An appropriate output emssage for the LCD was then sent over by the FPGA.</p>
-<p>This design implemented additional game logic on the FPGA that and then used that data to determine the hand gesture of the user. Then, it would send a message over SPI to the FPGA, which would compare the user’s play to the computer’s play, and output the appropriate message(s). The FPGA was also used to implement some game logic, where the computer’s next move was determined based on the user’s previous move, to make it more difficult to beat, and more interesting than just randomized plays.</p>
-<p>The block diagram for the software portion is pictured below.</p>
+<section id="data-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="data-interpretation">Data Interpretation</h3>
+<p>Incoming data fell into two groups:</p>
+<ul>
+<li>Display commands to update the LCD screen</li>
+<li>Game-state processing</li>
+</ul>
+<p>This classification was encoded into the byte sent from the MCU, allowing a multiplexer module to distinguish between the two and direct internal data flow to its corresponding modules. Signals commanding an update on the display was sent to a decoder that pulled the correct message from memory. Signals for game processing were sent to modules that interpreted the game state and precalculated the next computer move using game logic.</p>
+</section>
+</section>
+<section id="game-logic" class="level2">
+<h2 class="anchored" data-anchor-id="game-logic">Game Logic</h2>
+<p>The game logic for this project was integrated as a collection of <em>optional</em> modules within the FPGA design. Our decision model was derived from strategies published in a <a href="https://arxiv.org/pdf/1404.5199v1">study</a> on competition phenomena. The computer’s next move depends on two factors: the outcome ofthe previous round {win, lose, tie}, and the user’s previous gesture {rock, paper, scissors}. These values were encoded as internal state, providing context for the FPGA across rounds.</p>
+<p>When a new user gesture arrives from the LiDAR sensors, the logic immediately determines the outcome of the current round by comparing it with a precomputed computer move. At the same time, it precalculates the next computer move using the game theory. This calculation assumes perfect hidden information, so the next-move computation does not depend on any current-round data.</p>
+<p>The full game-logic pipeline was validated using a testbench below and passed all evaluated cases.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/theoretical_block_diagram.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 1: Block Diagram</figcaption>
+<p><img src="images/gametheory_proof.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 1: Testbench for Game Theory Logic Implementation</figcaption>
 </figure>
 </div>
 </section>
+<section id="lcd" class="level2">
+<h2 class="anchored" data-anchor-id="lcd">LCD</h2>
+<p>A 20x2 LCD was implemented, allowing the ability to display messages up to 40 characters in length. The system needed to display 11 various messages, the data of which was retrieved using the messages.sv submodule.</p>
+<p>To interface with the display, the lcd_driver module was responsible for controlling the LCD’s eleven input pins. This dirver used an FSM to step through all the various initialization steps, write the desired message to the LCD screen, and retrieve the necessary data from the internal EBR on the FPGA.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/lcd_driver_fsm.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 2: LCD Driver FSM</figcaption>
+</figure>
+</div>
+<p>To keep track of screen updates, the system <em>TRACKED</em> the current and previous screen. When these differed, the driver repositioned the cursor and cleared the display before writing a new message. Otherwise, the FPGA continuously cycled through the same 20-character message, appearing static to the user.</p>
+<p>Several states in the FSM required a precise wait period to allow for proper initialization. A counter was implemented to determine these specific time periods. The maximum counter value was set before the <em>WAIT</em> states, only exiting these states when the counter reached 0.</p>
 <section id="hardware" class="level3">
 <h3 class="anchored" data-anchor-id="hardware">Hardware</h3>
-<p>The hardware implementation was simple for this design, providing the neccessary connection between the major components of the system.</p>
+<p>The LCD interface required eleven FPAG pins: eight for a parrallel data bus (DB [7:0]) and three control signals- enable (en), read/write (rw, for internal ROM), and data select (rs). The backlight for the LCD was powered by 5V, and the character contrast was determined using a variable voltaged provided by a potentiometer.</p>
+<p>Once the initialization and command sequences were completed, the LCD displayed characters corresponding to the ASCII code communicated over the DB pins.</p>
+</section>
+<section id="memory" class="level3">
+<h3 class="anchored" data-anchor-id="memory">Memory</h3>
+<p>Eleven different messages needed to be displayed on the LCD. Each message consisted of 20 ASCII characters, each of which represented by two hex digits, totalling to 40 bytes. While these couldhave been hard-coded directly into the RTL, using the FPGA’s embedded block RAM produced a cleaner design and provided experience working with on-chip memory.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="images/ss.png" class="img-fluid figure-img"></p>
-<figcaption>Figure 2: Schematic</figcaption>
+<p><img src="images/ebr_config.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 3: EBR Configuration</figcaption>
 </figure>
 </div>
+<p>To configure the memory, the Lattic IP generator was used to specify the exact ROM size (160 x 22). Retrieval of each word from the EBR was accomplished by inputting the address of the message. To store all these messages in memory, a .mem file was produced with a python sscript and accessible to the FPGA.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/messages_waveform.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 4: Testbench for the Message Outputs</figcaption>
+</figure>
+</div>
+<p>The waveforms show validation of the memory integration.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/messages_proof.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 5: Printed Outputs in the Quartus Terminal for the Message Testbench</figcaption>
+</figure>
+</div>
+<p>Each line corresponds to a message address, where the first message is at address 0, the second message is at address 1, and so on. Messages contained the ASCII character values and were further padded with 0x20- the code for extra space to produce 160 bit data messages.</p>
+<p>The top-level memory module took in a message address and a character index, indicating which character should eb written in that moment.</p>
 
 
+</section>
 </section>
 </section>
 
@@ -255,7 +308,7 @@ ul.task-list li input[type="checkbox"] {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Isabella-Hottenrott\.github\.io\/e155-final-project-portfolio\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

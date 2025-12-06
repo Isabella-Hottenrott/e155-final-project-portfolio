@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>mcu – E155 Final Portfolio</title>
+<title>introduction – E155 Final Portfolio</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -98,11 +98,11 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">About</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./introduction.html"> 
+    <a class="nav-link active" href="./introduction.html" aria-current="page"> 
 <span class="menu-text">Introduction</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./mcu.html" aria-current="page"> 
+    <a class="nav-link" href="./mcu.html"> 
 <span class="menu-text">MCU</span></a>
   </li>  
   <li class="nav-item">
@@ -133,12 +133,11 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#mcu-components" id="toc-mcu-components" class="nav-link active" data-scroll-target="#mcu-components">MCU Components</a>
+  <li><a href="#abstract" id="toc-abstract" class="nav-link active" data-scroll-target="#abstract">Abstract</a></li>
+  <li><a href="#overall-design" id="toc-overall-design" class="nav-link" data-scroll-target="#overall-design">Overall Design</a>
   <ul class="collapse">
-  <li><a href="#i2c" id="toc-i2c" class="nav-link" data-scroll-target="#i2c">I2C</a></li>
-  <li><a href="#lidar" id="toc-lidar" class="nav-link" data-scroll-target="#lidar">LiDAR</a></li>
-  <li><a href="#spi" id="toc-spi" class="nav-link" data-scroll-target="#spi">SPI</a></li>
-  <li><a href="#game-flow" id="toc-game-flow" class="nav-link" data-scroll-target="#game-flow">Game Flow</a></li>
+  <li><a href="#software" id="toc-software" class="nav-link" data-scroll-target="#software">Software</a></li>
+  <li><a href="#hardware" id="toc-hardware" class="nav-link" data-scroll-target="#hardware">Hardware</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -149,28 +148,35 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="mcu-components" class="level1">
-<h1>MCU Components</h1>
-<p>In this project, the STM32L432KC MCU board was used. The two major comopnents on the MCU included I2C communication, initialization and reading the LiDAR sensors, SPI communication, and sequencing the game.</p>
-<section id="i2c" class="level2">
-<h2 class="anchored" data-anchor-id="i2c">I2C</h2>
-<p>The VL53L0X sensors use I2C protocol to communicate. Thus, the I2C1 peripheral on the MCU was implemented. Basic functions for the communication were written, such as init_i2c1() , read_i2c1(), and write_i2c2().</p>
-<p>Research uncovered a <a href="https://github.com/MarcelMG/VL53L0X-STM32F103">git repository</a> that contained code for the VL53L0X sensors, using a different STM32 family. This code was adapted from the provided API for the VL53L0X, simplifying and providing access to the major features of the sensor, while taking out uncommon and unnecessary configurations and commands. After attempting to work directly with the API at register level, using this repository became the clear better choice for the purposes of this design.</p>
-<p>Upon startup, each sensor was time-multiplexed via the XSHUT pin to set a unique address for simultaneous communication on the SDA bus. An initialization protocol was then followed for each sensor. From there, a command could be sent to the sensors to measure distances every new round.</p>
+<section id="abstract" class="level1">
+<h1>Abstract</h1>
+<p>This project implements a rock-paper-scissors game in hardware, enabling a user to play directly against the computer. The system captrues user’s hand gestures using LiDAR sensors that classify the hand shapes. An LCD screen communicates prompts, system feedback, and game results with the user.</p>
+<p>When the game begins, the user is asked to press a button to indicate the start of a new round. The user is then prompted to present a gesture. The LiDAR system interprets this and forwards the result to the FPGA, which displays outcomes and game state on the LCD. The display then resets to the initial prompt, preparing for the next round. A user can proceed to a new round, playing against a game logic implementation and likely increasing the difficulty of winning.</p>
 </section>
-<section id="lidar" class="level2">
-<h2 class="anchored" data-anchor-id="lidar">LiDAR</h2>
-<p>A major new hardware component were the VL53L0X ToF sensors, which use LiDAR to read distances of up to 2 meters.</p>
-<p>The HiLetGo breakout boards were used to house the sensors and provide easier connection to the pins, including those for I2C communication, which was used to retrieve distance measurements.</p>
-<p>Throughout development, issues with the VL53L0X modules were encountered. Whenever more than four sensors were implemented at a time, at least one failed to return valid distance readings, producing error codes. In the end, the design was constrained to this number of sensors for gesture processing.</p>
+<section id="overall-design" class="level1">
+<h1>Overall Design</h1>
+<section id="software" class="level3">
+<h3 class="anchored" data-anchor-id="software">Software</h3>
+<p>The system is built around two main controllers- the STM32L432KC micrcontroller and the iCE40UP5k FGPA ont he UPduino development board.</p>
+<p>The MCU interfaced with an array of VL53L0X time-of-flight sensors to capture the user’s hand gesture. The gestures were classified, and the result was transmitted to the FPGA via SPI. An appropriate output emssage for the LCD was then sent over by the FPGA.</p>
+<p>This design implemented additional game logic on the FPGA that and then used that data to determine the hand gesture of the user. Then, it would send a message over SPI to the FPGA, which would compare the user’s play to the computer’s play, and output the appropriate message(s). The FPGA was also used to implement some game logic, where the computer’s next move was determined based on the user’s previous move, to make it more difficult to beat, and more interesting than just randomized plays.</p>
+<p>The block diagram for the software portion is pictured below.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/theoretical_block_diagram.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 1: Block Diagram</figcaption>
+</figure>
+</div>
 </section>
-<section id="spi" class="level2">
-<h2 class="anchored" data-anchor-id="spi">SPI</h2>
-<p>This design attempted unidirectional SPI communication from the MCU to the FPGA. For the purposes of producing a result on demo day, this was replaced by parallel communication due to bugs related to the rates at which data was processed on different ends of the design. However, SPI communciation between the two boards was used and proven successful during the midpoint check in, when tight timing was not a constraint.</p>
-</section>
-<section id="game-flow" class="level2">
-<h2 class="anchored" data-anchor-id="game-flow">Game Flow</h2>
-<p>The flow of the game was directed by the MCU. This came in the form of sequencing the different screen signals and placing different delays between the stages of the game, allowing users to play at a normal pace.</p>
+<section id="hardware" class="level3">
+<h3 class="anchored" data-anchor-id="hardware">Hardware</h3>
+<p>The hardware implementation was simple for this design, providing the neccessary connection between the major components of the system.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/ss.png" class="img-fluid figure-img"></p>
+<figcaption>Figure 2: Schematic</figcaption>
+</figure>
+</div>
 
 
 </section>
@@ -249,7 +255,7 @@ ul.task-list li input[type="checkbox"] {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Isabella-Hottenrott\.github\.io\/e155-final-project-portfolio\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

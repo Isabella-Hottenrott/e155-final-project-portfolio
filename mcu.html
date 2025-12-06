@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>additionals – E155 Final Portfolio</title>
+<title>mcu – E155 Final Portfolio</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -102,7 +102,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Introduction</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./mcu.html"> 
+    <a class="nav-link active" href="./mcu.html" aria-current="page"> 
 <span class="menu-text">MCU</span></a>
   </li>  
   <li class="nav-item">
@@ -114,7 +114,7 @@ ul.task-list li input[type="checkbox"] {
 <span class="menu-text">Results</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./additionals.html" aria-current="page"> 
+    <a class="nav-link" href="./additionals.html"> 
 <span class="menu-text">Additionals</span></a>
   </li>  
 </ul>
@@ -133,8 +133,13 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#acknowledgements" id="toc-acknowledgements" class="nav-link active" data-scroll-target="#acknowledgements">Acknowledgements</a></li>
-  <li><a href="#ai-use" id="toc-ai-use" class="nav-link" data-scroll-target="#ai-use">AI Use</a></li>
+  <li><a href="#mcu-components" id="toc-mcu-components" class="nav-link active" data-scroll-target="#mcu-components">MCU Components</a>
+  <ul class="collapse">
+  <li><a href="#i2c" id="toc-i2c" class="nav-link" data-scroll-target="#i2c">I2C</a></li>
+  <li><a href="#lidar" id="toc-lidar" class="nav-link" data-scroll-target="#lidar">LiDAR</a></li>
+  <li><a href="#spi" id="toc-spi" class="nav-link" data-scroll-target="#spi">SPI</a></li>
+  <li><a href="#game-flow" id="toc-game-flow" class="nav-link" data-scroll-target="#game-flow">Game Flow</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -144,28 +149,31 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<section id="acknowledgements" class="level1">
-<h1>Acknowledgements</h1>
-<p>Thank you to everyone who made this project possible– Prof Spencer, for his unwavering support and advice. Xavier, for providing much-needed debugging help. We would like to thank the E155 TAs– Kavi Dey, Troy Kaufman, Vikram Krishna, who all helped us out at one point or another.</p>
-<p>We would also like to thank our classmates, who were always around to help us out when we needed it, throughout the semseter and during the final project.</p>
+<section id="mcu-components" class="level1">
+<h1>MCU Components</h1>
+<p>In this project, the STM32L432KC MCU board was used. The two major comopnents on the MCU included I2C communication, initialization and reading the LiDAR sensors, SPI communication, and sequencing the game.</p>
+<section id="i2c" class="level2">
+<h2 class="anchored" data-anchor-id="i2c">I2C</h2>
+<p>The VL53L0X sensors use I2C protocol to communicate. Thus, the I2C1 peripheral on the MCU was implemented. Basic functions for the communication were written, such as init_i2c1() , read_i2c1(), and write_i2c2().</p>
+<p>Research uncovered a <a href="https://github.com/MarcelMG/VL53L0X-STM32F103">git repository</a> that contained code for the VL53L0X sensors, using a different STM32 family. This code was adapted from the provided API for the VL53L0X, simplifying and providing access to the major features of the sensor, while taking out uncommon and unnecessary configurations and commands. After attempting to work directly with the API at register level, using this repository became the clear better choice for the purposes of this design.</p>
+<p>Upon startup, each sensor was time-multiplexed via the XSHUT pin to set a unique address for simultaneous communication on the SDA bus. An initialization protocol was then followed for each sensor. From there, a command could be sent to the sensors to measure distances every new round.</p>
 </section>
-<section id="ai-use" class="level1">
-<h1>AI Use</h1>
-<p>Bella mostly used AI for:</p>
-<ul>
-<li>Understanding error messages</li>
-<li>Writing small snippets of code</li>
-<li>Implementation ideation</li>
-</ul>
-<p>In this course she has found AI to be useful in these ways. She has personally often found that giving LLMs too broad of an implementation, or making them responsible for too much specificity is unhelpful. In reflection, however, she thinks she could have saved more time on this project by using AI.</p>
-<p>Wava mostly used AI for:</p>
-<ul>
-<li>Understanding the API</li>
-<li>Developing canonical RTL for the LCD</li>
-</ul>
-<p>She found AI to be useful in providing a framework for the FPGA communication to the LCD, since the initialization process is easier done and understood over an MCU.</p>
+<section id="lidar" class="level2">
+<h2 class="anchored" data-anchor-id="lidar">LiDAR</h2>
+<p>A major new hardware component were the VL53L0X ToF sensors, which use LiDAR to read distances of up to 2 meters.</p>
+<p>The HiLetGo breakout boards were used to house the sensors and provide easier connection to the pins, including those for I2C communication, which was used to retrieve distance measurements.</p>
+<p>Throughout development, issues with the VL53L0X modules were encountered. Whenever more than four sensors were implemented at a time, at least one failed to return valid distance readings, producing error codes. In the end, the design was constrained to this number of sensors for gesture processing.</p>
+</section>
+<section id="spi" class="level2">
+<h2 class="anchored" data-anchor-id="spi">SPI</h2>
+<p>This design attempted unidirectional SPI communication from the MCU to the FPGA. For the purposes of producing a result on demo day, this was replaced by parallel communication due to bugs related to the rates at which data was processed on different ends of the design. However, SPI communciation between the two boards was used and proven successful during the midpoint check in, when tight timing was not a constraint.</p>
+</section>
+<section id="game-flow" class="level2">
+<h2 class="anchored" data-anchor-id="game-flow">Game Flow</h2>
+<p>The flow of the game was directed by the MCU. This came in the form of sequencing the different screen signals and placing different delays between the stages of the game, allowing users to play at a normal pace.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
@@ -241,7 +249,7 @@ ul.task-list li input[type="checkbox"] {
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Isabella-Hottenrott\.github\.io\/e155-final-project-portfolio\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
