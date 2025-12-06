@@ -1,0 +1,32 @@
+---
+Title: "Results"
+Author: "Wava Chan & Isabella Hottenrott"
+format: html
+---
+
+# Results
+
+A fully functional rock paper scissors system was implemented. The LiDAR system reliably detects the user's gesture, and the LCD screen communicates proper outcomes and stages of the game.
+
+For demo day, there are a couple of key differences from the original design. These changes include:
+
+- Game logic was moved to the MCU
+- Communication between the FPGA and MCU was changed to parallel communication
+- The 10-round system was removed, allowing palyers to play indefinitely
+
+
+The below block diagram represents the design previewed on demo day.
+
+
+![Block Diagram Implemented on Demo Day](images/final_block_diagram.png){width=75%}
+
+
+# Issues
+
+Though we have faith in our original design, some changes were introduced to refine a working solution for demo day.
+
+The FPGA game logic worked in simulation, but faced integration issues. These changes were needed to overcome challenges in synchronization between clocks and processes for game state calculations done between the FPGA and MCU. Game logic was moved to the MCU to eliminate the associated problems. This also meant the communication between the FPGA and MCU was changed. Though SPI was fully functional at the mid-point checkoff, parallel communication reduced the areas to debug. Transactions were small, anyways, so the new parallel communication required only three bits. 
+
+The 10 round system was good in theory, but in reality would have taken too long when cycling between different audience members during demo day. 
+
+The LiDAR sensors kept throwing an errors whenever more than four sensors were implemented at a time. To try to diagnose this issue, we tried to speak with them over an arduino, providing easy access to their entire API. The arduino was mostly able to communicate with the sensors, leading us to believe the issues might lie in voltage regulation or power consumption past four sensors, and that this was better handled by the arduino instead of the MCU.

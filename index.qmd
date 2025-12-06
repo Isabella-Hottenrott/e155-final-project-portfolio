@@ -1,0 +1,8 @@
+---
+title: "E155 Final Project Portfolio"
+---
+
+This portfolio presents an implementation of Rock, Paper, Scissors using LiDAR sensors for hand-gesture recognition and game theory to beat opponents. The source code can be found in our [e155-final-project repository](https://github.com/Isabella-Hottenrott/e155-final-project).
+
+
+![Bella and Wava on Demo Day!](images/teampic.jpg)
